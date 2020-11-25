@@ -8,7 +8,8 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "build": "node_modules/.bin/webpack.cmd --config webpack.config.js --env=development"
+    "watch": "node_modules/.bin/webpack.cmd --config webpack.config.js --env=watch",
+    "build": "node_modules/.bin/webpack.cmd --config webpack.config.js --env=build"
   },
   "dependencies": {
     "vue-color-picker-wheel": "^0.4.3"

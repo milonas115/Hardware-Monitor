@@ -1,27 +1,24 @@
 var path = require('path');
 var webpack = require('webpack');
 var MiniCssExtractPlugin = require("mini-css-extract-plugin");
-var OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-var UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 var VueLoaderPlugin = require('vue-loader/lib/plugin');
 
-module.exports = function(env){
-	let is_production,
-		dirname = __dirname,
+module.exports = function(watcher){
+	let dirname = __dirname,
 		root = path.resolve(dirname+'/src'),
 		root_public = path.resolve(dirname+'/build');
 
 
 
 	return {
-		mode: is_production ? 'production' : 'development',
+		mode: 'development',
 		entry: [
 			root+'/main.js'
 		],
 		output: {
 			path: root_public,
 			publicPath: './',
-			filename: 'bundle' + (is_production ? '.min' : '') + '.js',
+			filename: 'bundle.js',
 			pathinfo: false
 		},
 		stats: {
@@ -35,8 +32,6 @@ module.exports = function(env){
 				test: /\.scss$|\.css$|\.styl$/,
 				use: ((e=[])=>{
 					e.push(MiniCssExtractPlugin.loader,'css-loader');
-					if(is_production)
-						e.push('postcss-loader');
 					e.push('sass-loader');
 					return e;
 				})()
@@ -67,7 +62,7 @@ module.exports = function(env){
 			}),
 			new VueLoaderPlugin(),
 			new MiniCssExtractPlugin({
-				filename: 'bundle' + (is_production ? '.min' : '') + '.css'
+				filename: 'bundle.css'
 			})
 		],
 		resolve: {
@@ -76,23 +71,12 @@ module.exports = function(env){
 			},
 			extensions: ['*', '.js', '.json','.vue']
 		},
-		watch: !is_production,
+		watch: watcher === 'watch',
 		performance: {
 			hints: false
 		},
 		optimization: {
-			minimizer: ((m=[])=>{
-				if(is_production)
-				{
-					m.push(new OptimizeCSSAssetsPlugin({}));
-					m.push(new UglifyJsPlugin({
-						cache: true,
-						parallel: true,
-						sourceMap: false
-					}));
-				}
-				return m;
-			})()
+
 		},
 		devtool: 'cheap-source-map',
 		target: 'electron-preload'
