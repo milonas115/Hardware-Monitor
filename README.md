@@ -15,14 +15,14 @@ If you have more than 1 monitor attached, the application will automatically att
 
 Images:
 
-![image](https://imgur.com/eKyD0bz)
+![Image](https://imgur.com/eKyD0bz.png)
 
-![image](https://imgur.com/DzqPxAV)
+![Image](https://imgur.com/DzqPxAV.png)
 
-![image](https://imgur.com/UMPbrln)
+![Image](https://imgur.com/UMPbrln.png)
 
-![image](https://imgur.com/5YWHyUt)
+![Image](https://imgur.com/5YWHyUt.png)
 
-![image](https://imgur.com/6o32x7F)
+![Image](https://imgur.com/6o32x7F.png)
 
-![image](https://imgur.com/PDHPhcd)
+![Image](https://imgur.com/PDHPhcd.png)
