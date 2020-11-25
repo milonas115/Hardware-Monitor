@@ -9,7 +9,7 @@ npm run make
 
 Run:
 
-Navigate to out\hardware-monitor-win32-x64 folder and run `hardware-monitor.exe`
+Navigate to the newly generated `out\hardware-monitor-win32-x64` folder and run `hardware-monitor.exe`
 
 If you have more than 1 monitor attached, the application will automatically attach itself to the smallest monitor and enter fullscreen mode.
 
