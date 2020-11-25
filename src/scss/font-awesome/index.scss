@@ -1,0 +1,17 @@
+@import '~font-awesome/css/font-awesome.min.css';
+
+.fa--spin {
+	animation-name: fa-spin-icon;
+	animation-duration: 2000ms;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear; 
+}
+
+@keyframes fa-spin-icon {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}
