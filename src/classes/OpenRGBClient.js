@@ -34,15 +34,7 @@ class OpenRGBClient
 		this.client.connect(this.port,this.ip,()=>{
 			this.connected = true;
 			log.info('OpenRGBClient: Connected');
-			return this.sendMessage('SetClientName','Hardware Monitor',()=>{
-				return this.getDeviceCount((count)=>{
-					return this.getDeviceDevices(count,(devices)=>{
-						this.devices = devices;
-						this.onChangeCallback?this.onChangeCallback():null;
-						return next ? next() : null;
-					});
-				});
-			});
+			return this.getDevices(next);
 		});
 		this.client.on('data',(data)=>{
 			this.buffer = Buffer.concat([this.buffer,data]);
@@ -77,6 +69,17 @@ class OpenRGBClient
 			return this.connect();
 		},1000);
 		return;
+	}
+	getDevices(next) {
+		return this.sendMessage('SetClientName','Hardware Monitor',()=>{
+			return this.getDeviceCount((count)=>{
+				return this.getDeviceDevices(count,(devices)=>{
+					this.devices = devices;
+					this.onChangeCallback?this.onChangeCallback():null;
+					return next ? next() : null;
+				});
+			});
+		});
 	}
 	getDeviceCount(next) {
 		return this.sendMessage('RequestDeviceCount',()=>{

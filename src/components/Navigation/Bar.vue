@@ -6,6 +6,7 @@
 			</template>
 		</b-dropdown>
 		<div class="ml-auto">
+			<div @click="refresh" class="text-light btn btn-sm btn-dark py-1"><i class="fa fa-refresh"></i></div>
 			<div v-if="!fullscreen" @click="minimize" class="text-light min-window btn btn-sm btn-dark py-1"><i class="fa fa-window-minimize"></i></div>
 			<div @click="maximize" class="text-light max-window btn btn-sm btn-dark py-1"><i class="fa fa-window-maximize"></i></div>
 			<div v-if="!fullscreen" @click="close" class="text-light close-window btn btn-sm btn-dark py-1"><i class="fa fa-window-close"></i></div>
@@ -53,6 +54,9 @@
 			},
 			close(){
 				this.$getWindow().close();
+			},
+			refresh(){
+				window.location.reload();
 			}
 		}
 	}

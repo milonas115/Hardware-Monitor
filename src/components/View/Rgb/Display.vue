@@ -3,11 +3,18 @@
 		<div class="navbar navbar-dark bg-primary py-1">
 			<div class="btn btn-sm btn-secondary" @click="addArea"><i class="fa fa-plus"></i> Add Area</div>
 			<div class="d-flex">
-				<div class="btn btn-sm mr-2" :class="{'btn-gray':!globalRainbow,'btn-light':globalRainbow}" @click="globalRainbow=!globalRainbow"><i class="fa fa-circle-o-notch"></i></div>
-				<color-picker class="form-control form-control-sm mr-1 bg-gray" :value="getRgb(null)" @input="setRgb(null,$event) && setGlobalColor()" :palette="colors" />
+				<div class="btn btn-sm" :class="{'btn-gray':!globalRainbow,'btn-light':globalRainbow}" @click="globalRainbow=!globalRainbow"><i class="fa fa-circle-o-notch"></i></div>
+				<color-picker class="form-control form-control-sm mr-1 bg-gray ml-2" :value="getRgb(null)" @input="setRgb(null,$event) && setGlobalColor()" :palette="colors" />
 			</div>
 		</div>
-
+		<div v-if="globalRainbow" class="navbar navbar-dark bg-primary py-1">
+			<div class="d-flex">
+				<div class="btn btn-sm btn-primary">Length</div>
+				<b-form-input style="max-width:60px" class="mr-2" size="sm" v-model.number="globalRainbowLength" />
+				<div class="btn btn-sm btn-primary">Rotate</div>
+				<b-form-input style="max-width:60px" class="mr-2" size="sm" v-model.number="globalRainbowRotate" />
+			</div>
+		</div>
 		
 			<table class="table">
 				<thead>
@@ -63,12 +70,14 @@
 <script>
 import VueColor from 'vue-color';
 import Draggable from 'vuedraggable';
-
+import { debounce } from '@/utils.js';
 export default {
 	props: ['system'],
 	data(){
 		return {
 			globalRainbow: false,
+			globalRainbowLength: 360,
+			globalRainbowRotate: 0,
 			globalColor: {
 				red: null,
 				green: null,
@@ -95,8 +104,14 @@ export default {
 	},
 	watch: {
 		globalRainbow(){
-			this.setGlobalRainbow();
+			return this.setGlobalRainbow();
 		},
+		globalRainbowLength: debounce(function(){
+			return this.setGlobalRainbow();
+		},250),
+		globalRainbowRotate: debounce(function(){
+			return this.setGlobalRainbow();
+		},250),
 		tableItems: {
 			immediate: true,
 			deep: true,
@@ -108,8 +123,13 @@ export default {
 					blue:this.system.rgbWidgets[0].state.blue
 				};
 				let rainbow = this.system.rgbWidgets[0].rainbow.enabled;
+				let rainbowLength = this.system.rgbWidgets[0].rainbow.length;
+				let rainbowRotate = this.system.rgbWidgets[0].rainbow.rotate;
+
 				let rgbChanged = false;
 				let rainbowChanged = false;
+				let rainbowLengthChanged = false;
+				let rainbowRotateChanged = false;
 
 				this.system.rgbWidgets.forEach((widget)=>{
 					if(widget.state.red != rgb.red)
@@ -120,6 +140,10 @@ export default {
 						rgbChanged = true;
 					if(widget.rainbow.enabled != rainbow)
 						rainbowChanged = true;
+					if(widget.rainbow.length != rainbowLength)
+						rainbowLengthChanged = true;
+					if(widget.rainbow.rotate != rainbowRotate)
+						rainbowRotateChanged = true;
 					return;
 				});
 
@@ -127,6 +151,11 @@ export default {
 					this.globalColor = rgb;
 				if(!rainbowChanged)
 					this.globalRainbow = rainbow;
+				if(!rainbowLengthChanged)
+					this.globalRainbowLength = rainbowLength;
+				if(!rainbowRotateChanged)
+					this.globalRainbowRotate = rainbowRotate;
+
 				return;
 			}
 		}
@@ -161,6 +190,11 @@ export default {
 		setGlobalRainbow(){
 			this.system.rgbWidgets.forEach((widget)=>{
 				widget.rainbow.enabled = this.globalRainbow;
+				if(widget.rainbow.enabled)
+				{
+					widget.rainbow.length = parseInt(this.globalRainbowLength);
+					widget.rainbow.rotate = parseInt(this.globalRainbowRotate);
+				}
 				return;
 			});
 		}

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-
+import { between } from '@/utils.js';
 class OpenRGBDevice
 {
 	constructor(buffer) {
@@ -184,11 +184,10 @@ class OpenRGBDevice
 				max = zone.ledsCount+index-1;
 			if(zone.id === zoneToSet)
 			{
-				for(let i=min;i<=max;i++)
-				{
-					if(!this.colors[i]) break;
+				between(min,max,(i)=>{
+					if(!this.colors[i]) return false;
 					this.setLedColorAtIndex(i,colorToSet);
-				}
+				});
 			}
 			index = index + zone.ledsCount;
 			return;
@@ -203,11 +202,10 @@ class OpenRGBDevice
 			if(zone.id === zoneToSet)
 			{
 				ledsToSet.forEach((range)=>{
-					for(let i=range[0];i<=range[1];i++)
-					{
-						if(!this.colors[min+i]) break;
+					between(range[0],range[1],(i)=>{
+						if(!this.colors[min+i]) return false;
 						this.setLedColorAtIndex(min+i,colorToSet);
-					}
+					});
 					return;
 				});
 			}
@@ -218,11 +216,10 @@ class OpenRGBDevice
 	}
 	setLedsColor(ledsToSet){
 		ledsToSet.forEach((range)=>{
-			for(let i=range[0];i<=range[1];i++)
-			{
-				if(!this.colors[i]) break;
+			between(range[0],range[1],(i)=>{
+				if(!this.colors[i]) return false;
 				this.setLedColorAtIndex(i,colorToSet);
-			}
+			});
 			return;
 		});
 		return this;

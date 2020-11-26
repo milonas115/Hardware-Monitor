@@ -336,3 +336,20 @@ export const eachReverse = function(obj,callback,stopOnFalse=true){
 	}
 	return obj;
 };
+
+export const between = function(start,end,next){
+	if(start <= end)
+	{
+		for(let i=start;i<=end;i++)
+		{
+			if(next(i,false) === false) break;
+		}
+	}
+	else 
+	{
+		for(let i=start;i>=end;i--)
+		{
+			if(next(i,true) === false) break;
+		}
+	}
+};

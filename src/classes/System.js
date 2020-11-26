@@ -2,9 +2,9 @@ import HWInfoClient from './HWInfoClient';
 import OpenRGBClient from './OpenRGBClient';
 import Vue from 'vue';
 import Store from 'electron-store';
-import { clone } from '@/utils.js';
+import { clone, between } from '@/utils.js';
 import beep from '@/modules/beep.js';
-import { changeHue } from '@/colors.js';
+import { changeHue, rgbToHSL } from '@/colors.js';
 import fs from 'fs';
 import { remote } from 'electron';
 
@@ -362,6 +362,7 @@ class System extends Vue
 								zone: "",
 								leds: [[null,null]]
 							}],
+							circular: false,
 							state: {
 								red: 0,
 								green: 0,
@@ -447,26 +448,37 @@ class System extends Vue
 								minLeds = 0,
 								index = 0;
 							target.leds.forEach((leds)=>{
-								for(let i=leds[0];i<=leds[1];i++)
-									maxLeds++;
-								return;
+								return between(leds[0],leds[1],()=>maxLeds++);
 							});
 							minLeds = Math.ceil(maxLeds*hardwareWidget.data.ratio);
 							return target.leds.forEach((leds)=>{
-								for(let i=leds[0];i<=leds[1];i++)
-								{
+								return between(leds[0],leds[1],(i,reverse)=>{
+									let n=i;
+									if(leds[2])
+									{
+										if(!reverse)
+										{
+											n = i+leds[2];
+											if(n > leds[1])
+												n = leds[0] + (n-leds[1]) - 1;
+										}
+										else 
+										{
+											n = i-leds[2];
+											if(n < leds[1])
+												n = leds[0] - (leds[1]-n) + 1;
+										}
+									}
+
 									let color = index <= minLeds ? clone(this.hardwareLevels[hardwareWidget.data.level].rgb) : {red:10,green:10,blue:10};
-									if(widget.monitor.reverse)
-										color = index >= (maxLeds-minLeds-1)  ? clone(this.hardwareLevels[hardwareWidget.data.level].rgb) : {red:10,green:10,blue:10};
 									find.push({
 										device: target.device,
 										zone: target.zone,
-										leds: [[i,i]],
+										leds: [[n,n]],
 										color: color
 									});
 									index++;
-								}
-								return;
+								});
 							});
 						});
 						color.target = find;
@@ -477,28 +489,66 @@ class System extends Vue
 						widget.target.forEach((target)=>{
 							let maxLeds = 0;
 							target.leds.forEach((leds)=>{
-								for(let i=leds[0];i<=leds[1];i++) maxLeds++;
-								return;
+								return between(leds[0],leds[1],()=>{ maxLeds++; });
 							});
-							let rotationStepSize = Math.ceil(widget.rainbow.length/maxLeds);
-							let currentRotation = widget.rainbow.rotate + (rotationStepSize/2);
-							while(currentRotation >= 360)
-								currentRotation -= 360;
+							let len = widget.rainbow.length;
+							let rotate = widget.rainbow.rotate;
+
+							if(maxLeds <= 0) return;
+							if(len <= 0) return;
+					
+							let rotationStepSize = Math.ceil(len/maxLeds);
+							let currentRotation = rotate + (rotationStepSize/2);
+
+							if(widget.circular)
+							{
+								let distance = Math.abs(rgbToHSL(changeHue({red:255,green:0,blue:0},rotate)).h - rgbToHSL(changeHue({red:255,green:0,blue:0},rotate+len)).h);
+								rotationStepSize = Math.ceil(rotationStepSize * (1+(distance/len)) );
+							}
+
+							let direction = 1;
+				
+							while(currentRotation >= (len+rotate))
+								currentRotation -= len;
+								
 							target.leds.forEach((leds)=>{
-								for(let i=leds[0];i<=leds[1];i++)
-								{
+								return between(leds[0],leds[1],(i,reverse)=>{
+									let n=i;
+									if(leds[2])
+									{
+										if(!reverse)
+										{
+											n = i+leds[2];
+											if(n > leds[1])
+												n = leds[0] + (n-leds[1]) - 1;
+										}
+										else 
+										{
+											n = i-leds[2];
+											if(n < leds[1])
+												n = leds[0] - (leds[1]-n) + 1;
+										}
+									}
+
 									let color = changeHue({red:255,green:0,blue:0},currentRotation);
 									find.push({
 										device: target.device,
 										zone: target.zone,
-										leds: [[i,i]],
+										leds: [[n,n]],
 										color: color
 									});
-									currentRotation += rotationStepSize;
-									while(currentRotation >= 360)
-										currentRotation -= 360;
-								}
-								return;
+									currentRotation = currentRotation + (direction * rotationStepSize);
+									if(currentRotation >= (rotate+len) )
+									{
+										currentRotation -= rotationStepSize;
+										direction = -1;
+									}
+									else if(currentRotation <= 0)
+									{
+										currentRotation += rotationStepSize;
+										direction = 1;
+									}
+								});
 							});
 							return;
 						});

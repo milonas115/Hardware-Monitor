@@ -7,9 +7,7 @@ module.exports = function(watcher){
 	let dirname = __dirname,
 		root = path.resolve(dirname+'/src'),
 		root_public = path.resolve(dirname+'/build');
-
-
-
+	watcher = watcher || {};
 	return {
 		mode: 'development',
 		entry: [
@@ -71,7 +69,7 @@ module.exports = function(watcher){
 			},
 			extensions: ['*', '.js', '.json','.vue']
 		},
-		watch: watcher === 'watch',
+		watch: !!watcher.watch,
 		performance: {
 			hints: false
 		},

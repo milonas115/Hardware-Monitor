@@ -1,10 +1,18 @@
 <template>
 	<div class="container-fluid p-3">
 
-
-		<b-form-group label="Name">
-			<b-form-input type="text" v-model="widget.name" />
-		</b-form-group>
+		<div class="row">
+			<div class="col">
+				<b-form-group label="Name">
+					<b-form-input type="text" v-model="widget.name" />
+				</b-form-group>
+			</div>
+			<div class="col">
+				<b-form-group label="Circular?">
+					<b-form-select v-model="widget.circular" :options="[{text:'Yes',value:true},{text:'No',value:false}]" />
+				</b-form-group>
+			</div>
+		</div>
 
 		<div class="card mb-3">
 			<div class="card-body">
@@ -27,21 +35,27 @@
 							<b-form-group label="LEDs">
 								<div v-for="(range,ri) in target.leds" :key="ri">
 									<div class="row">
-										<div class="col-5">
+										<div class="col">
 											<b-form-input type="number" placeholder="Start Index" v-model.number="range[0]" />
 										</div>
 										<div class="col-1">
 											<div class="btn btn-secondary w-100"><i class="fa fa-arrow-right"></i></div>
 										</div>
-										<div class="col-5">
+										<div class="col">
 											<b-form-input type="number" placeholder="End Index" v-model.number="range[1]" />
+										</div>
+										<div class="col-1">
+											<div class="btn btn-secondary w-100"><i class="fa fa-random"></i></div>
+										</div>
+										<div class="col">
+											<b-form-input type="number" placeholder="Shift" v-model.number="range[2]" />
 										</div>
 										<div class="col-1">
 											<div class="btn btn-danger" @click="target.leds.splice(ri,1)"><i class="fa fa-remove"></i></div>
 										</div>
 									</div>
 								</div>
-								<span class="text-primary cursor-pointer" @click="target.leds.push(['',''])">Add LEDs</span>
+								<span class="text-primary cursor-pointer" @click="target.leds.push([null,null,null])">Add LEDs</span>
 							</b-form-group>
 						</div>
 					</div>
@@ -50,7 +64,7 @@
 						<span class="text-danger cursor-pointer" @click="widget.target.splice(ti,1)">Remove Target</span>
 					</div>
 				</div>
-				<span class="text-primary cursor-pointer" @click="widget.target.push({device:'',zone:'',leds:[[null,null]]})">Add Target</span>
+				<span class="text-primary cursor-pointer" @click="widget.target.push({device:'',zone:'',leds:[[null,null,null]]})">Add Target</span>
 			</div>
 		</div>
 
@@ -138,16 +152,9 @@
 							}]" />
 						</b-form-group>
 					</div>
-				</div>
-				<div class="row" v-if="!widget.rainbow.enabled && widget.monitor.widgetIndex>=0">
-					<div class="col-6">
+					<div class="col" v-if="widget.monitor.widgetIndex>=0">
 						<b-form-group label="Show as Chart?">
 							<b-form-select v-model="widget.monitor.analyze" :options="[{text:'No',value:0},{text:'Yes',value:1}]" />
-						</b-form-group>
-					</div>
-					<div class="col-6">
-						<b-form-group label="Reverse?">
-							<b-form-select v-model="widget.monitor.reverse" :options="[{text:'No',value:0},{text:'Yes',value:1}]" />
 						</b-form-group>
 					</div>
 				</div>

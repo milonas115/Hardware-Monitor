@@ -39,7 +39,7 @@ beep.repeat = function(freq = 750, duration = 350, vol = 100) {
 			return !stopped;
 		},
 		start(){
-			if(this.beeping()) return console.log('wtf');
+			if(this.beeping()) return;
 			stopped = false;
 			run();
 			return;
